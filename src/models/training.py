@@ -4,21 +4,22 @@ from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
 
 
-def create_dataloader(X, y, batch_size=64):
+def create_dataloader(X, y, device="cpu", batch_size=64):
     """
-    Convert data to PyTorch tensors and create a DataLoader.
+    Convert data to PyTorch tensors, move them to the specified device, and create a DataLoader.
     
     Parameters:
     - X: Input data (numpy array).
     - y: Labels (numpy array).
+    - device: The device (GPU/CPU) where the data should be loaded.
     - batch_size: Batch size for the DataLoader.
     
     Returns:
     - DataLoader object.
     """
     # Convert data to PyTorch tensors
-    X_tensor = torch.tensor(X, dtype=torch.float32)
-    y_tensor = torch.tensor(y, dtype=torch.float32)
+    X_tensor = torch.tensor(X, dtype=torch.float32).to(device)
+    y_tensor = torch.tensor(y, dtype=torch.float32).to(device)
     
     # Create DataLoader
     dataset = TensorDataset(X_tensor, y_tensor)
@@ -26,7 +27,7 @@ def create_dataloader(X, y, batch_size=64):
     
     return loader
 
-def prepare_dataloaders(X_train, y_train, X_val, y_val, X_test, y_test, batch_size=64):
+def prepare_dataloaders(X_train, y_train, X_val, y_val, X_test, y_test, device="cpu", batch_size=64):
     """
     Prepare DataLoader objects for training, validation, and test data.
     
@@ -39,13 +40,14 @@ def prepare_dataloaders(X_train, y_train, X_val, y_val, X_test, y_test, batch_si
     Returns:
     - train_loader, val_loader, test_loader: DataLoader objects for training, validation, and testing.
     """
-    train_loader = create_dataloader(X_train, y_train, batch_size)
-    val_loader = create_dataloader(X_val, y_val, batch_size)
-    test_loader = create_dataloader(X_test, y_test, batch_size)
+    train_loader = create_dataloader(X_train, y_train, device, batch_size)
+    val_loader = create_dataloader(X_val, y_val, device, batch_size)
+    test_loader = create_dataloader(X_test, y_test, device, batch_size)
     
     return train_loader, val_loader, test_loader
 
-def train_model(model, train_loader, val_loader, criterion, optimizer, num_epochs):
+def train_model(model, train_loader, val_loader, criterion, optimizer, num_epochs, device="cpu"):
+    model.to(device)
     # Initialize the tqdm progress bar
     pbar = tqdm(range(num_epochs), desc="Training", unit="epoch")
 
