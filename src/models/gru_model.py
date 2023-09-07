@@ -12,7 +12,7 @@ class GRUModel(nn.Module):
         self.linear = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, x):
-        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim).requires_grad_()
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim).to(x.device).requires_grad_()
         out, _ = self.gru(x, h0.detach())
         out = self.linear(out[:, -1, :])
         return out
