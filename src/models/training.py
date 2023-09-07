@@ -60,6 +60,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
         running_loss = 0.0
         
         for i, (sequences, labels) in enumerate(train_loader):
+            sequences, labels = sequences.to(device), labels.to(device)
             # Forward pass
             outputs = model(sequences)
             loss = criterion(outputs, labels)
@@ -80,6 +81,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
         val_loss = 0.0
         with torch.no_grad():
             for sequences, labels in val_loader:
+                sequences, labels = sequences.to(device), labels.to(device)
                 outputs = model(sequences)
                 loss = criterion(outputs, labels)
                 val_loss += loss.item()
