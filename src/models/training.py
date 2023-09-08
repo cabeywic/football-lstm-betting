@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
 
 
-def create_dataloader(X, y, device="cpu", batch_size=64):
+def create_dataloader(X, y, batch_size=64):
     """
     Convert data to PyTorch tensors, move them to the specified device, and create a DataLoader.
     
@@ -18,8 +18,8 @@ def create_dataloader(X, y, device="cpu", batch_size=64):
     - DataLoader object.
     """
     # Convert data to PyTorch tensors
-    X_tensor = torch.tensor(X, dtype=torch.float32).to(device)
-    y_tensor = torch.tensor(y, dtype=torch.float32).to(device)
+    X_tensor = torch.tensor(X, dtype=torch.float32)
+    y_tensor = torch.tensor(y, dtype=torch.float32)
     
     # Create DataLoader
     dataset = TensorDataset(X_tensor, y_tensor)
@@ -27,7 +27,7 @@ def create_dataloader(X, y, device="cpu", batch_size=64):
     
     return loader
 
-def prepare_dataloaders(X_train, y_train, X_val, y_val, X_test, y_test, device="cpu", batch_size=64):
+def prepare_dataloaders(X_train, y_train, X_val, y_val, X_test, y_test, batch_size=64):
     """
     Prepare DataLoader objects for training, validation, and test data.
     
@@ -40,13 +40,13 @@ def prepare_dataloaders(X_train, y_train, X_val, y_val, X_test, y_test, device="
     Returns:
     - train_loader, val_loader, test_loader: DataLoader objects for training, validation, and testing.
     """
-    train_loader = create_dataloader(X_train, y_train, device, batch_size)
-    val_loader = create_dataloader(X_val, y_val, device, batch_size)
-    test_loader = create_dataloader(X_test, y_test, device, batch_size)
+    train_loader = create_dataloader(X_train, y_train, batch_size)
+    val_loader = create_dataloader(X_val, y_val, batch_size)
+    test_loader = create_dataloader(X_test, y_test, batch_size)
     
     return train_loader, val_loader, test_loader
 
-def train_model(model, train_loader, val_loader, criterion, optimizer, num_epochs, device="cpu"):
+def train_model(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, device="cpu"):
     model.to(device)
     # Initialize the tqdm progress bar
     pbar = tqdm(range(num_epochs), desc="Training", unit="epoch")
@@ -70,6 +70,9 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
             loss.backward()
             optimizer.step()
             
+            # Update the scheduler
+            scheduler.step()
+            
             running_loss += loss.item()
         
         # Calculate average loss for the epoch
@@ -90,8 +93,12 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
         avg_val_loss = val_loss / len(val_loader)
         val_losses.append(avg_val_loss)
         
-        # Update tqdm progress bar with the average loss
-        pbar.set_postfix({'Epoch Train Loss': f'{avg_train_loss:.4f}', 'Epoch Val Loss': f'{avg_val_loss:.4f}'})
+        # Update tqdm progress bar with the average loss and current learning rate
+        pbar.set_postfix({
+            'Epoch Train Loss': f'{avg_train_loss:.4f}', 
+            'Epoch Val Loss': f'{avg_val_loss:.4f}',
+            'LR': f'{scheduler.get_last_lr()[0]:.6f}'  # Display the current learning rate
+        })
 
     return train_losses, val_losses
     
