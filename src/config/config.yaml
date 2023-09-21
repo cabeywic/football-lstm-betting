@@ -1,0 +1,22 @@
+paths:
+  data_dir: /tmp/data/
+market_filter:
+  event_ids:
+    - 32477684
+  event_type_ids:
+    - 2
+  market_type_codes:
+    - MATCH_ODDS
+market_data_filter:
+  - EX_ALL_OFFERS
+  - EX_TRADED
+  - EX_TRADED_VOL
+  - EX_LTP
+  - EX_BEST_OFFERS_DISP
+  - EX_BEST_OFFERS
+  - EX_MARKET_DEF
+betfair:
+  username: ${USERNAME}
+  password: ${PASSWORD}
+  certs_path: ${CERTS_PATH}
+  app_key: ${APP_KEY}
