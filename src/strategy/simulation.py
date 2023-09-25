@@ -2,7 +2,8 @@ import glob
 import os
 import math
 from utils.stratergy_logging_control import BacktestLoggingControl
-from strategy.lstm_stratergy import ModelFlatBetting
+from strategy.lstm_strategy import ModelFlatBetting
+from strategy.base_strategy import BaseFlatBetting
 from flumine import FlumineSimulation, BaseStrategy, utils, clients
 from concurrent import futures
 
@@ -19,11 +20,7 @@ def run_sim_process(strategy: BaseStrategy, file_name: str = "sim_strategy.csv")
     
     framework.add_strategy(strategy)
     framework.add_logging_control(
-        BacktestLoggingControl(
-            context = {
-                "file_name": file_name
-            }
-        )
+        BacktestLoggingControl()
     )
     framework.run()
 

@@ -35,20 +35,19 @@ class BacktestLoggingControl(LoggingControl):
 
     def __init__(self, *args, **kwargs):
         super(BacktestLoggingControl, self).__init__(*args, **kwargs)
-        file_name = self.context.get("file_name", "sim_strategy.csv")
-        self._setup(file_name)
+        self._setup()
 
-    def _setup(self, file_name):
-        if os.path.exists(file_name):
-            self._logger.info("Results file exists")
+    def _setup(self):
+        if os.path.exists("sim_strategy.csv"):
+            logging.info("Results file exists")
         else:
-            with open(file_name, "w") as m:
+            with open("sim_strategy.csv", "w") as m:
                 csv_writer = csv.DictWriter(m, delimiter=",", fieldnames=FIELDNAMES)
                 csv_writer.writeheader()
 
     def _process_cleared_orders_meta(self, event):
         orders = event.event
-        with open("sim_hta_4.csv", "a") as m:
+        with open("sim_strategy.csv", "a") as m:
             for order in orders:
                 if order.order_type.ORDER_TYPE == OrderTypes.LIMIT:
                     size = order.order_type.size
